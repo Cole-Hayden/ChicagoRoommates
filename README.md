@@ -1,2 +1,0 @@
-# ChicagoRoommates
-initial
