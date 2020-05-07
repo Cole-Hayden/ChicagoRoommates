@@ -22,7 +22,7 @@ firebase.initializeApp(config);
 //const db = firebase.firestore();
 
 
-const { validateSignUpData, validateLoginData } = require('../util/validators');
+const { validateSignUpData, validateLoginData, reduceUserDetails } = require('../util/validators');
 
 exports.signUp = (req, res) => {
     const newUser = {
@@ -78,7 +78,7 @@ exports.signUp = (req, res) => {
         }
     });
 }
-
+//Log in users
 exports.login = (req, res) => {
     const user = {
         email: req.body.email,
@@ -109,6 +109,42 @@ exports.login = (req, res) => {
     })
 }
 
+//Add user details
+exports.addUserDetails = (req, res) => {
+    let userDetails = reduceUserDetails(req.body);
+
+    db.doc(`/users/${req.user.handle}`).update(userDetails)
+    .then(() => {
+        return res.json({ message: 'Details added successfully'});
+    })
+    .catch(err => {
+        console.error(err);
+        return res.status(500).json({error: err.code});
+    });
+
+};
+// Get own user details
+exports.getAuthenticatedUser = (req, res) => {
+    let userData = {};
+    db.doc(`/users/${req.user.handle}`).get().then(doc => {
+        if(doc.exists){
+            userData.credentials = doc.data();
+            return db.collection('likes').where('userHandle', '==', req.user.handle).get()
+        }
+    })
+    .then(data => {
+        userData.likes = [];
+        data.forEach(doc => {
+            userData.likes.push(doc.data());
+        });
+        return res.json(userData);
+    })
+    .catch(err => {
+        console.error(err);
+        return res.status(500).json({error: err.code});
+    });
+}
+// UPload a profile image for user
 exports.uploadImage = (req, res) => {
     const BusBoy = require('busboy');
     const path = require('path');
@@ -120,16 +156,14 @@ exports.uploadImage = (req, res) => {
     let imageFileName;
     let imageToBeUploaded = {};
 
-
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+        if(mimetype !== 'image/jpeg' && mimetype !== 'image/png'){
+            return res.status(400).json({error: 'Wrong file type submitted'});
+        }
         // image.png
-        console.log(fieldname);
-        console.log(filename);
-        console.log(mimetype);
-
         const imageExtension = filename.split('.')[filename.split('.').length - 1];
 
-        imageFileName = `${Math.round(random()*10000)}.${imageExtension}`;
+        imageFileName = `${Math.round(Math.random()*10000)}.${imageExtension}`;
         const filepath = path.join(os.tmpdir(), imageFileName);
         imageToBeUploaded = {filepath, mimetype};
         file.pipe(fs.createWriteStream(filepath));
@@ -151,6 +185,7 @@ exports.uploadImage = (req, res) => {
       }).catch(err => {
           console.error(err);
           return res.status(500).json({error: err.code});
-      }) //figure out config 
-    })
-}
+      });
+    });
+    busboy.end(req.rawBody);
+};

@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
 
-var d = {
+/*var d = {
     "type": "service_account",
     "project_id": "chicagoroommates",
     "private_key_id": "31f3ca1c6fa3ef05d672f71fc2a2b924deb73098",
@@ -16,7 +16,7 @@ var d = {
 admin.initializeApp({
     credential: admin.credential.cert(d)
 });
-
+*/
 const db = admin.firestore();
 
 
@@ -66,4 +66,27 @@ exports.postOneScream = (req, res) => {
         console.error(err);
     });
 
+}
+
+exports.getScream = (req, res) => {
+    let screamData = {};
+    db.doc(`/screams/${req.params.screamId}`).get().then(doc => {
+        if(!doc.exists){
+            return res.status(404).json({error: 'Scream not found'})
+        }
+        screamData = doc.data();
+        screamData.screamId = doc.id;
+        return db.collection('comments').where('screamId', '==', req.params.screamId).get();
+    })
+    .then(data => {
+        screamData.comments = [];
+        data.forEach(doc => {
+            screamData.push(doc.data())
+        });
+        return res.json(screamData);
+    })
+    .catch(err => {
+        console.error(err);
+        res.status(500).json({ error: err.code });
+    })
 }

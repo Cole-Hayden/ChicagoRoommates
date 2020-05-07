@@ -18,7 +18,8 @@ config =  {
 
 const { getAllScreams } = require('./handlers/screams');
 const { postOneScream } = require('./handlers/screams');
-const { signUp, login, uploadImage } = require('./handlers/users');
+const { getScream } = require('./handlers/screams');
+const { signUp, login, uploadImage, addUserDetails, getAuthenticatedUser } = require('./handlers/users');
 
 /*admin.initializeApp({
     credential: admin.credential.cert(require('../key/admin.json'))
@@ -29,6 +30,14 @@ app.post('/scream', FBAuth, postOneScream);
 app.post('/signup', signUp);
 app.post('/login', login);
 app.post('/user/image', FBAuth, uploadImage);
+app.post('/user',FBAuth, addUserDetails);
+app.get('/user', FBAuth, getAuthenticatedUser);
+app.get('/scream/:screamId', getScream);
+//TODO: delete scream
+// TODO: like a scream
+// TODO: unlike a scream
+// TODO: comment on a scream
+
 
 //SignUp route
 
