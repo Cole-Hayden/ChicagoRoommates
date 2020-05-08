@@ -4,8 +4,9 @@ const isEmail = (email) => {
 };
 
 const isEmpty = (string) => {
-    if (string.trim() === '') return true;
-    else return false;
+   // if (string.trim() === '') return true;
+    //else 
+    return false;
 };
 
 exports.validateSignUpData = (data) => {
