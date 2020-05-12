@@ -19,9 +19,16 @@ config =  {
     measurementId: "G-Q6KGMBKQKE"
   };
 
-const { getAllScreams } = require('./handlers/screams');
-const { postOneScream } = require('./handlers/screams');
-const { getScream, likeScream, unlikeScream, deleteScream } = require('./handlers/screams');
+
+const {
+    getAllScreams,
+    postOneScream,
+    getScream,
+    commentOnScream,
+    likeScream,
+    unlikeScream,
+    deleteScream
+  } = require('./handlers/screams');
 const { signUp, login, uploadImage, addUserDetails, getAuthenticatedUser } = require('./handlers/users');
 
 /*admin.initializeApp({
@@ -77,6 +84,19 @@ app.get('/scream/:screamId/unlike', FBAuth, unlikeScream);
          return;
      });
  });
+
+exports.deleteNotificationOnUnLike = functions.region('europe-west1')
+.firestore.document('likes/{id}').onDelete((snapshot) => {
+    db.doc(`/notifications/${snapshot.id}`)
+    .delete()
+    .then(()=> {
+        return;
+    })
+    .catch(err => {
+        console.error(err);
+        return;
+    })
+});
 
  exports.createNotificationOnComment = functions.region('europe-west1')
  .firestore.document('likes/{id}')
