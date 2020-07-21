@@ -15,8 +15,8 @@ const admin = require('firebase-admin');
 
 admin.initializeApp({
     credential: admin.credential.cert(d)
-});
-*/
+});*/
+
 const db = admin.firestore();
 
 
@@ -48,6 +48,7 @@ exports.postOneScream = (req, res) => {
     if(req.method !== 'POST'){
         return res.status(400).json({ error: 'Method not allowed'});
     }
+    console.log(req.user.imageUrl);
     const newScream = {
         body: req.body.body,
         userHandle: req.user.handle,

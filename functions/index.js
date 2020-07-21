@@ -39,7 +39,7 @@ app.get('/screams', getAllScreams);
 app.post('/scream', FBAuth, postOneScream);
 app.post('/signup', signUp);
 app.post('/login', login);
-app.post('/user/image', FBAuth, uploadImage);
+app.post('/user/image',  FBAuth, uploadImage);
 app.post('/user',FBAuth, addUserDetails);
 app.get('/user', FBAuth, getAuthenticatedUser);
 app.get('/scream/:screamId', getScream);
