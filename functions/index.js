@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const app = require('express')();
+const nodemailer = require('nodemailer');
 const FBAuth = require('./util/fbAuth');
 
 const { db } = require('./util/admin');

@@ -4,6 +4,8 @@ admin.initializeApp();
 
 const db = admin.firestore();
 */
+
+const nodemailer = require("nodemailer");
 config =  {
     apiKey: "AIzaSyBUUHLwQ1HGkRcvjSJ72NwDTnndfo2ZE9E",
     authDomain: "chicagoroommates.firebaseapp.com",
@@ -29,15 +31,41 @@ function uuidv4() {
 
 
 const { validateSignUpData, validateLoginData, reduceUserDetails } = require('../util/validators');
+//const Mail = require("nodemailer/lib/mailer");
 
+async function main() {
+let transporter = nodemailer.createTransport({
+    service: "outlook",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: 'ifonlyiwasjoking1337@outlook.com', // generated ethereal user
+      pass: 'fade2Die4ch17$1', // generated ethereal password
+    },
+  });
+
+  // send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: '"Fred Foo 👻"<ifonlyiwasjoking1337@outlook.com>', // sender address
+    to: "cole.hayden.us@gmail.com", // list of receivers
+    subject: "Hello ✔", // Subject line
+    text: "Hello world?", // plain text body
+    html: "<b>Hello world?</b>", // html body
+  });
+
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+  // Preview only available when sending through an Ethereal account
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+}
 exports.signUp = (req, res) => {
     const newUser = {
         email: req.body.email,
         password: req.body.password,
         confirmPassword: req.body.confirmPassword,
         handle: req.body.handle,
-        test: req.body.test,
-        location: req.body.location
+        test: req.body.test
     };
    // console.log(req.body.email);
    // console.log(req.body.password);
@@ -70,13 +98,18 @@ exports.signUp = (req, res) => {
             email: newUser.email,
             createdAt: new Date().toISOString(),
             test: newUser.test,
-            location: newUser.location,
             imageUrl: `https://firebasestorage.googleapis.com/v0/b/chicagoroommates.appspot.com/o/${noImg}?alt=media`,
             userId
         };
         return db.doc(`/users/${newUser.handle}`).set(userCredentials);
     })
     .then(() => {
+
+        
+
+        main();
+
+
         return res.status(201).json({ token });
     })
     .catch(err => {
